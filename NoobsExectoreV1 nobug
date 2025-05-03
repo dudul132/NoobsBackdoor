@@ -1,0 +1,261 @@
+local Players = game:GetService("Players")
+local UserInputService = game:GetService("UserInputService")
+local CoreGui = game:GetService("CoreGui")
+local RunService = game:GetService("RunService")
+
+local LocalPlayer = Players.LocalPlayer
+local Mouse = LocalPlayer:GetMouse()
+
+pcall(function() CoreGui:FindFirstChild("NoobsExecutor"):Destroy() end)
+
+local gui = Instance.new("ScreenGui", CoreGui)
+gui.Name = "NoobsExecutor"
+gui.ResetOnSpawn = false
+
+-- Label Warna-warni Nama Executor
+local rainbowLabel = Instance.new("TextLabel")
+rainbowLabel.Size = UDim2.new(0, 200, 0, 30)
+rainbowLabel.Position = UDim2.new(0.5, -100, 0, 0)
+rainbowLabel.BackgroundTransparency = 1
+rainbowLabel.Text = "NoobsExecutor"
+rainbowLabel.Font = Enum.Font.GothamBold
+rainbowLabel.TextSize = 24
+rainbowLabel.TextStrokeTransparency = 0
+rainbowLabel.TextColor3 = Color3.new(1, 0, 0)
+rainbowLabel.Parent = gui
+
+local hue = 0
+RunService.RenderStepped:Connect(function()
+    hue = (hue + 1) % 255
+    rainbowLabel.TextColor3 = Color3.fromHSV(hue / 255, 1, 1)
+end)
+
+-- Tombol Toggle Kecil
+local toggle = Instance.new("TextButton", gui)
+toggle.Size = UDim2.new(0, 40, 0, 40)
+toggle.Position = UDim2.new(0, 10, 0, 10)
+toggle.Text = ">"
+toggle.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+toggle.TextColor3 = Color3.new(1, 1, 1)
+toggle.Active = true
+toggle.Draggable = true
+
+-- Frame UI utama
+local frame = Instance.new("Frame", gui)
+frame.Size = UDim2.new(0, 600, 0, 450)
+frame.Position = UDim2.new(0.5, -300, 0.5, -225)
+frame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+frame.Visible = false
+frame.Active = true
+frame.Draggable = true
+
+-- Tombol Minimize dan Close
+local min = Instance.new("TextButton", frame)
+min.Size = UDim2.new(0, 30, 0, 30)
+min.Position = UDim2.new(1, -60, 0, 0)
+min.Text = "-"
+local close = Instance.new("TextButton", frame)
+close.Size = UDim2.new(0, 30, 0, 30)
+close.Position = UDim2.new(1, -30, 0, 0)
+close.Text = "X"
+for _, btn in ipairs({min, close}) do
+    btn.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+    btn.TextColor3 = Color3.new(1, 1, 1)
+end
+min.MouseButton1Click:Connect(function()
+    frame.Visible = false
+    toggle.Visible = true
+end)
+close.MouseButton1Click:Connect(function() gui:Destroy() end)
+toggle.MouseButton1Click:Connect(function()
+    frame.Visible = not frame.Visible
+end)
+
+-- Scroll Panel Tombol
+local scroll = Instance.new("ScrollingFrame", frame)
+scroll.Size = UDim2.new(0, 110, 1, -30)
+scroll.Position = UDim2.new(0, 0, 0, 30)
+scroll.CanvasSize = UDim2.new(0, 0, 0, 1000)
+scroll.ScrollBarThickness = 4
+scroll.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+
+local layout = Instance.new("UIListLayout", scroll)
+layout.SortOrder = Enum.SortOrder.LayoutOrder
+
+-- Helper untuk buat tombol
+local function createButton(text, callback)
+    local btn = Instance.new("TextButton")
+    btn.Size = UDim2.new(1, -10, 0, 30)
+    btn.Text = text
+    btn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+    btn.TextColor3 = Color3.new(1, 1, 1)
+    btn.Parent = scroll
+    btn.MouseButton1Click:Connect(callback)
+end
+
+-- Fly Control (Android)
+local flyToggle = false
+local bodyGyro, bodyVelocity
+local previousTouchPosition = nil
+
+local function startFlying()
+    local hrp = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+    if not hrp then return end
+
+    bodyGyro = Instance.new("BodyGyro")
+    bodyGyro.MaxTorque = Vector3.new(400000, 400000, 400000)
+    bodyGyro.CFrame = hrp.CFrame
+    bodyGyro.Parent = hrp
+
+    bodyVelocity = Instance.new("BodyVelocity")
+    bodyVelocity.MaxForce = Vector3.new(400000, 400000, 400000)
+    bodyVelocity.Velocity = Vector3.new(0, 50, 0) -- Start with hovering velocity
+    bodyVelocity.Parent = hrp
+end
+
+local function stopFlying()
+    if bodyGyro then bodyGyro:Destroy() end
+    if bodyVelocity then bodyVelocity:Destroy() end
+end
+
+UserInputService.TouchStarted:Connect(function(touch)
+    if flyToggle then
+        previousTouchPosition = touch.Position
+    end
+end)
+
+UserInputService.TouchMoved:Connect(function(touch)
+    if flyToggle and previousTouchPosition then
+        local delta = touch.Position - previousTouchPosition
+        local hrp = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+        if hrp then
+            -- Arahkan karakter berdasarkan pergerakan jari
+            local direction = Vector3.new(delta.X, delta.Y, 0)
+            bodyVelocity.Velocity = direction * 50
+        end
+        previousTouchPosition = touch.Position
+    end
+end)
+
+UserInputService.TouchEnded:Connect(function(touch)
+    if flyToggle then
+        previousTouchPosition = nil
+    end
+end)
+
+-- Tombol untuk toggle Fly
+createButton("Fly / UnFly", function()
+    flyToggle = not flyToggle
+    if flyToggle then
+        startFlying()
+    else
+        stopFlying()
+    end
+end)
+
+-- Infinite Jump
+local infjump = false
+createButton("Infinite Jump / UnJump", function()
+    infjump = not infjump
+end)
+
+UserInputService.JumpRequest:Connect(function()
+    if infjump and LocalPlayer.Character then
+        LocalPlayer.Character:FindFirstChildOfClass("Humanoid"):ChangeState("Jumping")
+    end
+end)
+
+-- Invisible / Visible
+local invisible = false
+createButton("Invisible / Visible", function()
+    local char = LocalPlayer.Character
+    if not char then return end
+    for _, part in ipairs(char:GetDescendants()) do
+        if part:IsA("BasePart") and part.Name ~= "HumanoidRootPart" then
+            part.Transparency = invisible and 0 or 1
+            part.CanCollide = invisible and false or true
+        end
+    end
+    invisible = not invisible
+end)
+
+-- NoClip / UnClip
+local noclip = false
+RunService.Stepped:Connect(function()
+    if LocalPlayer.Character and noclip then
+        for _, part in ipairs(LocalPlayer.Character:GetDescendants()) do
+            if part:IsA("BasePart") then part.CanCollide = false end
+        end
+    end
+end)
+
+createButton("NoClip / UnClip", function()
+    noclip = not noclip
+end)
+
+-- Kotak Script
+local box = Instance.new("TextBox", frame)
+box.Size = UDim2.new(1, -130, 0, 200)
+box.Position = UDim2.new(0, 120, 0, 40)
+box.TextXAlignment = Enum.TextXAlignment.Left
+box.TextYAlignment = Enum.TextYAlignment.Top
+box.TextWrapped = true
+box.MultiLine = true
+box.Text = "-- Masukkan script di sini"
+box.ClearTextOnFocus = false
+box.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+box.TextColor3 = Color3.new(1, 1, 1)
+box.Font = Enum.Font.Code
+box.TextSize = 14
+
+-- Console Box
+local console = Instance.new("TextBox", frame)
+console.Size = UDim2.new(1, -130, 0, 100)
+console.Position = UDim2.new(0, 120, 0, 250)
+console.BackgroundColor3 = Color3.fromRGB(10, 10, 10)
+console.TextColor3 = Color3.new(0, 1, 0)
+console.Text = "[Console Loaded]"
+console.Font = Enum.Font.Code
+console.TextSize = 14
+console.TextXAlignment = Enum.TextXAlignment.Left
+console.TextYAlignment = Enum.TextYAlignment.Top
+console.MultiLine = true
+console.ClearTextOnFocus = false
+
+-- Tombol Eksekusi
+local execute = Instance.new("TextButton", frame)
+execute.Size = UDim2.new(0, 80, 0, 30)
+execute.Position = UDim2.new(0, 120, 0, 370)
+execute.Text = "Execute"
+execute.BackgroundColor3 = Color3.fromRGB(50, 120, 50)
+execute.TextColor3 = Color3.new(1, 1, 1)
+
+execute.MouseButton1Click:Connect(function()
+    local func, err = loadstring(box.Text)
+    if func then
+        pcall(function()
+            func()
+            console.Text = console.Text .. "\n[Executed]"
+        end)
+    else
+        console.Text = console.Text .. "\n[Error] " .. tostring(err)
+    end
+end)
+
+-- Tombol Clear
+local clear = Instance.new("TextButton", frame)
+clear.Size = UDim2.new(0, 80, 0, 30)
+clear.Position = UDim2.new(0, 210, 0, 370)
+clear.Text = "Clear"
+clear.BackgroundColor3 = Color3.fromRGB(120, 50, 50)
+clear.TextColor3 = Color3.new(1, 1, 1)
+clear.MouseButton1Click:Connect(function()
+    box.Text = ""
+    console.Text = "[Console Cleared]"
+end)
+
+-- Menambahkan tombol NoobsBackdoor
+createButton("NoobsBackdoor", function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/dudul132/NoobsBackdoor/refs/heads/main/NoobsBackdoor"))()
+end)
+
