@@ -1,0 +1,79 @@
+-- Mendapatkan semua elemen UI dan tombol yang dibutuhkan
+local buttonX = script.Parent.X -- Tombol X untuk menyembunyikan UI
+local buttonStrip = script.Parent.Strip -- Tombol Strip untuk mengubah menjadi logo Roblox kecil
+local uiNoobsBackdoor = script.Parent.Parent -- UI NoobsBackdoor
+local scriptBox = script.Parent.Parent.ScriptBox -- Kotak input script
+local player = game.Players.LocalPlayer -- Mengambil pemain yang sedang menjalankan NoobsBackdoor
+
+-- Tombol X: Menyembunyikan semua elemen UI
+local uiElements = uiNoobsBackdoor:GetChildren()
+buttonX.MouseButton1Click:Connect(function()
+    -- Menyembunyikan semua elemen UI
+    for _, element in pairs(uiElements) do
+        if element:IsA("GuiObject") then
+            element.Visible = false
+        end
+    end
+end)
+
+-- Tombol Strip: Mengubah UI menjadi logo Roblox kecil dan bisa digerakkan
+local logoRoblox = Instance.new("ImageLabel") -- Membuat logo Roblox kecil
+
+-- Menambahkan logo Roblox kecil
+logoRoblox.Size = UDim2.new(0, 50, 0, 50) -- Ukuran logo kecil
+logoRoblox.Position = UDim2.new(0.5, -25, 0.5, -25) -- Menempatkan logo di tengah-tengah
+logoRoblox.Image = "rbxassetid://6031096033" -- ID gambar logo Roblox
+logoRoblox.BackgroundTransparency = 1 -- Tanpa latar belakang
+logoRoblox.Parent = uiNoobsBackdoor
+
+-- Tombol Strip: Mengubah UI menjadi logo Roblox kecil
+buttonStrip.MouseButton1Click:Connect(function()
+    -- Ganti UI menjadi logo Roblox kecil
+    uiNoobsBackdoor.Visible = false  -- Sembunyikan UI asli
+
+    -- Logo Roblox terlihat dan bisa digerakkan
+    logoRoblox.Visible = true
+    logoRoblox.Active = true
+    logoRoblox.Draggable = true
+end)
+
+-- Tombol "Polygon": Memasukkan skrip ke dalam kotak script
+local buttonPolygon = script.Parent.Polygon -- Tombol Polygon
+buttonPolygon.MouseButton1Click:Connect(function()
+    local playerName = player.Name
+    scriptBox.Text = "require(6338277134)('" .. playerName .. "')"
+end)
+
+-- Tombol "Infinite Yield (ss)": Memasukkan skrip ke dalam kotak script
+local buttonInfiniteYield = script.Parent.InfiniteYield -- Tombol Infinite Yield
+buttonInfiniteYield.MouseButton1Click:Connect(function()
+    local playerName = player.Name
+    scriptBox.Text = "require(7634392335)('" .. playerName .. "')"
+end)
+
+-- Tombol "Obunga Jumpscare Load": Memasukkan skrip ke dalam kotak script
+local buttonObunga = script.Parent.Obunga -- Tombol Obunga Jumpscare Load
+buttonObunga.MouseButton1Click:Connect(function()
+    scriptBox.Text = "for _, v in pairs(game.Players:GetPlayers()) do\n    require(94540928447702).s(v.Name)\nend"
+end)
+
+-- Tombol "KJ": Memasukkan skrip ke dalam kotak script
+local buttonKJ = script.Parent.KJ -- Tombol KJ
+buttonKJ.MouseButton1Click:Connect(function()
+    local playerName = player.Name
+    scriptBox.Text = "require(89529616632600)('" .. playerName .. "', 'KJ')"
+end)
+
+-- Tombol "Jonh Doe": Memasukkan skrip ke dalam kotak script
+local buttonJonhDoe = script.Parent.JonhDoe -- Tombol Jonh Doe
+buttonJonhDoe.MouseButton1Click:Connect(function()
+    local playerName = player.Name
+    scriptBox.Text = "require(8973689388).load('" .. playerName .. "')"
+end)
+
+-- Tombol "Sensation": Memasukkan skrip ke dalam kotak script
+local buttonSensation = script.Parent.Sensation -- Tombol Senation
+buttonSensation.MouseButton1Click:Connect(function()
+    local playerName = player.Name
+    scriptBox.Text = "require(100263845596551)('" .. playerName .. "', ColorSequence.new(Color3.fromRGB(71, 148, 253), Color3.fromRGB(71, 253, 160)), 'Standard')"
+end)
