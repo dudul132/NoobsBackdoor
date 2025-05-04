@@ -1,0 +1,160 @@
+local Players = game:GetService("Players")
+local TweenService = game:GetService("TweenService")
+local UserInputService = game:GetService("UserInputService")
+
+local player = Players.LocalPlayer
+local gui = Instance.new("ScreenGui", player:WaitForChild("PlayerGui"))
+gui.Name = "NoobsExecutore"
+gui.ResetOnSpawn = false
+
+-- Tombol N
+local btnN = Instance.new("TextButton", gui)
+btnN.Size = UDim2.new(0, 40, 0, 40)
+btnN.Position = UDim2.new(0.5, -20, 0, 10)
+btnN.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+btnN.Text = "N"
+btnN.TextColor3 = Color3.new(1, 1, 1)
+btnN.Font = Enum.Font.GothamBold
+btnN.TextSize = 18
+
+-- Frame UI
+local frame = Instance.new("Frame", gui)
+frame.Size = UDim2.new(0, 500, 0, 300)
+frame.Position = UDim2.new(0.5, -250, -1, 0)
+frame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+frame.BorderSizePixel = 0
+frame.Visible = false
+frame.Active = true
+frame.Draggable = true
+
+-- Header
+local header = Instance.new("TextLabel", frame)
+header.Size = UDim2.new(1, 0, 0, 30)
+header.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+header.Text = "   NoobsExecutore Script Version"
+header.Font = Enum.Font.GothamBold
+header.TextColor3 = Color3.new(1, 1, 1)
+header.TextSize = 16
+header.TextXAlignment = Enum.TextXAlignment.Left
+
+-- Indikator hijau
+local indicator = Instance.new("Frame", header)
+indicator.Size = UDim2.new(0, 10, 0, 10)
+indicator.Position = UDim2.new(0, 5, 0.5, -5)
+indicator.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
+indicator.BorderSizePixel = 0
+indicator.ZIndex = 2
+indicator.AnchorPoint = Vector2.new(0, 0)
+
+-- Tombol minimize
+local minimize = Instance.new("TextButton", header)
+minimize.Size = UDim2.new(0, 30, 0, 30)
+minimize.Position = UDim2.new(1, -30, 0, 0)
+minimize.Text = "-"
+minimize.BackgroundColor3 = Color3.fromRGB(170, 0, 0)
+minimize.TextColor3 = Color3.new(1,1,1)
+
+-- TextBox
+local textbox = Instance.new("TextBox", frame)
+textbox.Position = UDim2.new(0, 10, 0, 40)
+textbox.Size = UDim2.new(0.6, -20, 0.6, -10)
+textbox.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+textbox.TextColor3 = Color3.new(1, 1, 1)
+textbox.Text = "-- PUT SCRIPT HERE LOADSTRING"
+textbox.Font = Enum.Font.Code
+textbox.TextSize = 16
+textbox.MultiLine = true
+textbox.ClearTextOnFocus = false
+textbox.TextXAlignment = Enum.TextXAlignment.Left
+textbox.TextYAlignment = Enum.TextYAlignment.Top
+
+-- Tombol Execute dan Clear
+local exec = Instance.new("TextButton", frame)
+exec.Size = UDim2.new(0.3, -10, 0, 40)
+exec.Position = UDim2.new(0.05, 0, 0.75, 0)
+exec.Text = "EXECUTE"
+exec.BackgroundColor3 = Color3.fromRGB(0, 170, 0)
+exec.TextColor3 = Color3.new(1,1,1)
+exec.Font = Enum.Font.GothamBold
+exec.TextSize = 18
+
+local clear = Instance.new("TextButton", frame)
+clear.Size = UDim2.new(0.3, -10, 0, 40)
+clear.Position = UDim2.new(0.35, 0, 0.75, 0)
+clear.Text = "CLEAR"
+clear.BackgroundColor3 = Color3.fromRGB(200, 0, 0)
+clear.TextColor3 = Color3.new(1,1,1)
+clear.Font = Enum.Font.GothamBold
+clear.TextSize = 18
+
+-- Tombol shortcut kanan
+local scripts = {
+	["Infinite Yield"] = "https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source",
+	["GhostHub"] = "https://raw.githubusercontent.com/GhostPlayer352/Test4/main/GhostHub",
+	["Starlight"] = "https://starlightrbx.netlify.app/",
+	["Null sc"] = "https://raw.githubusercontent.com/InfernusScripts/Null-Fire/main/Loader",
+	["SolarHub"] = "https://raw.githubusercontent.com/qwezxcno9il/scriptroblox/refs/heads/main/README.md",
+	["R6 sploit"] = "https://pastebin.com/raw/0hryQeGw"
+}
+
+local y = 0.05
+for name, url in pairs(scripts) do
+	local btn = Instance.new("TextButton", frame)
+	btn.Size = UDim2.new(0.3, -10, 0, 30)
+	btn.Position = UDim2.new(0.65, 0, y, 0)
+	btn.Text = name
+	btn.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+	btn.TextColor3 = Color3.new(1, 1, 1)
+	btn.Font = Enum.Font.Gotham
+	btn.TextSize = 14
+	btn.MouseButton1Click:Connect(function()
+		local success, res = pcall(function()
+			loadstring(game:HttpGet(url))()
+		end)
+		if not success then
+			warn("Gagal load " .. name .. ": " .. res)
+		end
+	end)
+	y += 0.12
+end
+
+-- Fungsi tombol
+exec.MouseButton1Click:Connect(function()
+	local code = textbox.Text
+	local func, err = loadstring(code)
+	if func then
+		pcall(func)
+	else
+		warn("Script Error:", err)
+	end
+end)
+
+clear.MouseButton1Click:Connect(function()
+	textbox.Text = ""
+end)
+
+-- Animasi muncul UI saat tombol N
+btnN.MouseButton1Click:Connect(function()
+	frame.Visible = true
+	TweenService:Create(frame, TweenInfo.new(0.5), {
+		Position = UDim2.new(0.5, -250, 0.5, -150)
+	}):Play()
+	TweenService:Create(btnN, TweenInfo.new(0.5), {
+		Position = UDim2.new(0.5, -20, -1, 0)
+	}):Play()
+	wait(0.5)
+	btnN.Visible = false
+end)
+
+-- Minimize
+minimize.MouseButton1Click:Connect(function()
+	TweenService:Create(frame, TweenInfo.new(0.5), {
+		Position = UDim2.new(0.5, -250, -1, 0)
+	}):Play()
+	wait(0.5)
+	frame.Visible = false
+	btnN.Visible = true
+	TweenService:Create(btnN, TweenInfo.new(0.5), {
+		Position = UDim2.new(0.5, -20, 0, 10)
+	}):Play()
+end)
