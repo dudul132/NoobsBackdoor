@@ -1,0 +1,104 @@
+local Players = game:GetService("Players")
+local VirtualInputManager = game:GetService("VirtualInputManager")
+local player = Players.LocalPlayer
+
+-- UI Container
+local screenGui = Instance.new("ScreenGui", player:WaitForChild("PlayerGui"))
+screenGui.Name = "AddButtonKeyboardUI"
+screenGui.ResetOnSpawn = false
+
+-- Main UI Frame
+local mainFrame = Instance.new("Frame", screenGui)
+mainFrame.Size = UDim2.new(0, 250, 0, 150)
+mainFrame.Position = UDim2.new(0.4, 0, 0.3, 0)
+mainFrame.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
+mainFrame.Active = true
+mainFrame.Draggable = true
+
+-- Title
+local title = Instance.new("TextLabel", mainFrame)
+title.Size = UDim2.new(1, 0, 0, 30)
+title.BackgroundTransparency = 1
+title.Text = "Add keyboard buttons"
+title.TextColor3 = Color3.new(1, 1, 1)
+title.Font = Enum.Font.SourceSansBold
+title.TextSize = 18
+
+-- Input box
+local input = Instance.new("TextBox", mainFrame)
+input.Size = UDim2.new(0.8, 0, 0, 30)
+input.Position = UDim2.new(0.1, 0, 0.3, 0)
+input.PlaceholderText = "1 Letter only"
+input.Text = ""
+input.ClearTextOnFocus = false
+input.TextScaled = true
+input.Font = Enum.Font.SourceSans
+
+-- Add button
+local addButton = Instance.new("TextButton", mainFrame)
+addButton.Size = UDim2.new(0.8, 0, 0, 30)
+addButton.Position = UDim2.new(0.1, 0, 0.55, 0)
+addButton.Text = "Add"
+addButton.TextScaled = true
+addButton.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
+addButton.Font = Enum.Font.SourceSansBold
+
+-- Close main UI button
+local closeUI = Instance.new("TextButton", mainFrame)
+closeUI.Size = UDim2.new(0, 25, 0, 25)
+closeUI.Position = UDim2.new(1, -30, 0, 5)
+closeUI.Text = "X"
+closeUI.TextScaled = true
+closeUI.BackgroundColor3 = Color3.fromRGB(120, 60, 60)
+
+-- Function: create keyboard button
+local function createKeyButton(letter)
+	local keyButton = Instance.new("TextButton", screenGui)
+	keyButton.Size = UDim2.new(0, 40, 0, 40)
+	keyButton.Position = UDim2.new(0.5, math.random(-150, 150), 0.6, math.random(-100, 100))
+	keyButton.Text = letter
+	keyButton.BackgroundColor3 = Color3.fromRGB(90, 90, 90)
+	keyButton.TextColor3 = Color3.new(1, 1, 1)
+	keyButton.Font = Enum.Font.SourceSansBold
+	keyButton.TextScaled = true
+	keyButton.Active = true
+	keyButton.Draggable = true
+
+	-- X close on the button
+	local close = Instance.new("TextButton", keyButton)
+	close.Size = UDim2.new(0, 20, 0, 20)
+	close.Position = UDim2.new(1, -20, 0, 0)
+	close.Text = "X"
+	close.TextScaled = true
+	close.BackgroundColor3 = Color3.fromRGB(150, 0, 0)
+	close.MouseButton1Click:Connect(function()
+		keyButton:Destroy()
+	end)
+
+	-- Send key press
+	keyButton.MouseButton1Click:Connect(function()
+		VirtualInputManager:SendKeyEvent(true, letter:upper(), false, game)
+		task.wait(0.05)
+		VirtualInputManager:SendKeyEvent(false, letter:upper(), false, game)
+	end)
+end
+
+-- Limit to 1 character input
+input:GetPropertyChangedSignal("Text"):Connect(function()
+	if #input.Text > 1 then
+		input.Text = input.Text:sub(1, 1)
+	end
+end)
+
+-- Add button click
+addButton.MouseButton1Click:Connect(function()
+	local txt = input.Text:upper()
+	if txt ~= "" then
+		createKeyButton(txt)
+	end
+end)
+
+-- Close main UI (not the buttons)
+closeUI.MouseButton1Click:Connect(function()
+	mainFrame.Visible = false
+end)
